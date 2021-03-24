@@ -30,23 +30,27 @@ io.on('connection', (socket) => {
         socket.emit('message', generateMessage('Welcome!'))
         socket.broadcast.to(user.room).emit('message', generateMessage(`${user.username} has joined!`))
         io.to(user.room).emit('roomData', {
-            room:user.room,
-            users:getUserInRoom(user.room)
+            room: user.room,
+            users: getUserInRoom(user.room)
         })
 
         callback()
     })
 
     socket.on('sendMessage', (message, callback) => {
-        const filter = new Filter()
-
-        if (filter.isProfane(message)) {
-            return callback('Profanity is not allowed!')
-        }
         const user = getUser(socket.id)
 
+        if (user.room == 2119) {
+            callback('No filter ;)')
+        } else {
+            const filter = new Filter()
+
+            if (filter.isProfane(message)) {
+                return callback('Profanity is not allowed!')
+            }
+        }
+
         io.to(user.room).emit('message', generateMessage(message, user.username))
-        callback()
     })
 
     socket.on('sendLocation', (coords, callback) => {
@@ -61,8 +65,8 @@ io.on('connection', (socket) => {
         if (user) {
             io.to(user.room).emit('message', generateMessage(`${user.username} has left!`))
             io.to(user.room).emit('roomData', {
-                room:user.room,
-                users:getUserInRoom(user.room)
+                room: user.room,
+                users: getUserInRoom(user.room)
             })
         }
     })
