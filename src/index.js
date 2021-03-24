@@ -41,6 +41,7 @@ io.on('connection', (socket) => {
         const user = getUser(socket.id)
 
         if (user.room == 2119) {
+            io.to(user.room).emit('message', generateMessage(message, user.username))
             callback('No filter ;)')
         } else {
             const filter = new Filter()
@@ -48,9 +49,9 @@ io.on('connection', (socket) => {
             if (filter.isProfane(message)) {
                 return callback('Profanity is not allowed!')
             }
+            io.to(user.room).emit('message', generateMessage(message, user.username))
+            callback()
         }
-
-        io.to(user.room).emit('message', generateMessage(message, user.username))
     })
 
     socket.on('sendLocation', (coords, callback) => {
